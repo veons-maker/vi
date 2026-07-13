@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Galaxy Clicker</title>
+
+<style>
+
+body{
+ margin:0;
+ min-height:100vh;
+ background:linear-gradient(#05051a,#202080);
+ color:white;
+ font-family:Arial;
+ text-align:center;
+}
+
+h1{
+ margin-top:20px;
+}
+
+#coin{
+ font-size:35px;
+ color:gold;
+}
+
+#clickPlanet{
+ margin:70px auto 20px;
+ width:150px;
+ height:150px;
+ border-radius:50%;
+ background:radial-gradient(circle,#00ffff,#0044ff,#000);
+ box-shadow:0 0 40px cyan;
+ cursor:pointer;
+}
+
+#clickPlanet:active{
+ transform:scale(.85);
+}
+
+.box{
+ width:85%;
+ max-width:330px;
+ margin:15px auto;
+ padding:15px;
+ background:#ffffff22;
+ border-radius:20px;
+}
+
+button{
+ width:90%;
+ padding:12px;
+ margin:5px;
+ border:0;
+ border-radius:15px;
+ font-size:16px;
+}
+
+hr{
+ border:1px solid #ffffff44;
+}
+
+</style>
+
+</head><body>
+
+<h1>🌌 Galaxy Clicker</h1>
+
+<div id="coin">0 💰</div>
+
+<div id="clickPlanet" onclick="klik()"></div>
+
+
+<div class="box">
+
+<p>⚡ Power: <span id="power">1</span></p>
+
+<p>💰 Harga Upgrade: <span id="hargaUpgrade">100</span></p>
+
+<button onclick="upgrade()">
+⚡ Upgrade Power
+</button>
+
+
+<hr>
+
+<h3>🛒 SHOP</h3>
+
+
+<p>🖱️ Auto Clicker: <span id="auto">0</span></p>
+<p>Harga: 1.000</p>
+
+<button onclick="beliAuto()">
+🖱️ Beli Auto Clicker
+</button>
+
+
+<p>🚀 Roket: <span id="roket">0</span></p>
+<p>Harga: 10.000</p>
+
+<button onclick="beliRoket()">
+🚀 Beli Roket
+</button>
+
+
+<p>🪐 Planet: <span id="planet">0</span></p>
+<p>Harga: 100.000</p>
+
+<button onclick="beliPlanet()">
+🪐 Beli Planet
+</button>
+
+
+<p>☀️ Matahari: <span id="matahari">0</span></p>
+<p>Harga: 500.000</p>
+
+<button onclick="beliMatahari()">
+☀️ Beli Matahari
+</button>
+
+
+<p>🌌 Nebula: <span id="nebula">0</span></p>
+<p>Harga: 1.000.000</p>
+
+<button onclick="beliNebula()">
+🌌 Beli Nebula
+</button>
+
+
+</div><script>
+
+let coin = Number(localStorage.getItem("coin")) || 0;
+let power = Number(localStorage.getItem("power")) || 1;
+
+let auto = Number(localStorage.getItem("auto")) || 0;
+let roket = Number(localStorage.getItem("roket")) || 0;
+let planet = Number(localStorage.getItem("planet")) || 0;
+let matahari = Number(localStorage.getItem("matahari")) || 0;
+let nebula = Number(localStorage.getItem("nebula")) || 0;
+
+
+// klik planet
+function klik(){
+
+coin += power;
+
+update();
+save();
+
+}
+
+
+// upgrade power
+function upgrade(){
+
+let harga = power * 100;
+
+if(coin >= harga){
+
+coin -= harga;
+power++;
+
+update();
+save();
+
+}else{
+
+alert("Butuh "+harga+" coin!");
+
+}
+
+}
+
+
+// beli auto clicker
+function beliAuto(){
+
+if(coin >= 1000){
+
+coin -= 1000;
+auto++;
+
+update();
+save();
+
+}else{
+
+alert("Butuh 1.000 coin!");
+
+}
+
+}
+
+
+// beli roket
+function beliRoket(){
+
+if(coin >= 10000){
+
+coin -= 10000;
+roket++;
+
+update();
+save();
+
+}else{
+
+alert("Butuh 10.000 coin!");
+
+}
+
+}
+
+
+// beli planet
+function beliPlanet(){
+
+if(coin >= 100000){
+
+coin -= 100000;
+planet++;
+
+update();
+save();
+
+}else{
+
+alert("Butuh 100.000 coin!");
+
+}
+
+}
+
+
+// beli matahari
+function beliMatahari(){
+
+if(coin >= 500000){
+
+coin -= 500000;
+matahari++;
+
+update();
+save();
+
+}else{
+
+alert("Butuh 500.000 coin!");
+
+}
+
+}
+
+
+// beli nebula
+function beliNebula(){
+
+if(coin >= 1000000){
+
+coin -= 1000000;
+nebula++;
+
+update();
+save();
+
+}else{
+
+alert("Butuh 1.000.000 coin!");
+
+}
+
+}
+
+
+// pendapatan otomatis setiap detik
+
+setInterval(()=>{
+
+coin +=
+(auto * 10) +
+(roket * 10) +
+(planet * 150) +
+(matahari * 1000) +
+(nebula * 20000);
+
+
+update();
+save();
+
+},1000);
+
+
+
+// simpan data
+
+function save(){
+
+localStorage.setItem("coin",coin);
+localStorage.setItem("power",power);
+
+localStorage.setItem("auto",auto);
+localStorage.setItem("roket",roket);
+localStorage.setItem("planet",planet);
+localStorage.setItem("matahari",matahari);
+localStorage.setItem("nebula",nebula);
+
+}
+
+
+
+// update tampilan
+
+function update(){
+
+document.getElementById("coin").innerHTML =
+coin+" 💰";
+
+document.getElementById("power").innerHTML =
+power;
+
+document.getElementById("hargaUpgrade").innerHTML =
+power*100;
+
+document.getElementById("auto").innerHTML =
+auto;
+
+document.getElementById("roket").innerHTML =
+roket;
+
+document.getElementById("planet").innerHTML =
+planet;
+
+document.getElementById("matahari").innerHTML =
+matahari;
+
+document.getElementById("nebula").innerHTML =
+nebula;
+
+}
+
+
+update();
+
+</script>
+
+
+</body>
+</html>
