@@ -60,16 +60,39 @@ hr{
  border:1px solid #ffffff44;
 }
 
+.floating{
+ position:fixed;
+ color:gold;
+ font-size:25px;
+ font-weight:bold;
+ pointer-events:none;
+ z-index:999;
+ animation:naik 1s linear forwards;
+}
+
+@keyframes naik{
+ from{
+  opacity:1;
+  transform:translateY(0);
+ }
+
+ to{
+  opacity:0;
+  transform:translateY(-60px);
+ }
+}
+
 </style>
 
-</head><body>
+</head>
+
+<body>
 
 <h1>🌌 Galaxy Clicker</h1>
 
 <div id="coin">0 💰</div>
 
-<div id="clickPlanet" onclick="klik()"></div>
-
+<div id="clickPlanet" onclick="klik(event)"></div>
 
 <div class="box">
 
@@ -81,11 +104,9 @@ hr{
 ⚡ Upgrade Power
 </button>
 
-
 <hr>
 
 <h3>🛒 SHOP</h3>
-
 
 <p>🖱️ Auto Clicker: <span id="auto">0</span></p>
 <p>Harga: 1.000</p>
@@ -94,14 +115,12 @@ hr{
 🖱️ Beli Auto Clicker
 </button>
 
-
 <p>🚀 Roket: <span id="roket">0</span></p>
 <p>Harga: 10.000</p>
 
 <button onclick="beliRoket()">
 🚀 Beli Roket
 </button>
-
 
 <p>🪐 Planet: <span id="planet">0</span></p>
 <p>Harga: 100.000</p>
@@ -110,7 +129,6 @@ hr{
 🪐 Beli Planet
 </button>
 
-
 <p>☀️ Matahari: <span id="matahari">0</span></p>
 <p>Harga: 500.000</p>
 
@@ -118,18 +136,25 @@ hr{
 ☀️ Beli Matahari
 </button>
 
-
 <p>🌌 Nebula: <span id="nebula">0</span></p>
 <p>Harga: 1.000.000</p>
 
 <button onclick="beliNebula()">
-🌌 Beli Nebula
+🌌 Beli nebula
 </button>
 
+<p>💥 Supernova: <span id="supernova">0</span></p>
+<p>harga: 1.000.000.000</p>
 
-</div><script>
+<button onclick="belisupernova()">
+💥 beli supernova
+</button>
 
-let coin = Number(localStorage.getItem("coin")) || 0;
+</div>
+
+<script>
+
+let coin = Number(localStorage.getItem("coin"))
 let power = Number(localStorage.getItem("power")) || 1;
 
 let auto = Number(localStorage.getItem("auto")) || 0;
@@ -137,212 +162,244 @@ let roket = Number(localStorage.getItem("roket")) || 0;
 let planet = Number(localStorage.getItem("planet")) || 0;
 let matahari = Number(localStorage.getItem("matahari")) || 0;
 let nebula = Number(localStorage.getItem("nebula")) || 0;
+let supernova = Number(localStorage.getItem("supernova")) || 0;
 
+let achievement1000 = false;
+let achievement100000 = false;
+let achievement1000000 = false;
+function klik(event){
+  
+  let achievement10000 = false;
+let achievement100000 = false;
+let achievement1000000 = false;
 
-// klik planet
-function klik(){
+ coin += power;
 
-coin += power;
+ let text=document.createElement("div");
 
-update();
-save();
+ text.className="floating";
+ text.innerHTML="+"+power;
+
+ text.style.left=event.clientX+"px";
+ text.style.top=event.clientY+"px";
+
+ document.body.appendChild(text);
+
+ setTimeout(()=>{
+  text.remove();
+ },1000);
+
+ update();
+ save();
 
 }
 
-
-// upgrade power
 function upgrade(){
 
-let harga = power * 100;
+ let harga=power*100;
 
-if(coin >= harga){
+ if(coin>=harga){
 
-coin -= harga;
-power++;
+  coin-=harga;
+  power++;
 
-update();
-save();
+  update();
+  save();
 
-}else{
+ }else{
 
-alert("Butuh "+harga+" coin!");
+  alert("Butuh "+harga.toLocaleString()+" coin!");
 
-}
-
-}
-
-
-// beli auto clicker
-function beliAuto(){
-
-if(coin >= 1000){
-
-coin -= 1000;
-auto++;
-
-update();
-save();
-
-}else{
-
-alert("Butuh 1.000 coin!");
+ }
 
 }
 
+function beliauro(){
+
+ if(coin>=1000){
+
+  coin-=1000;
+  auto++;
+  
+alert("Auto sekarang: " + auto);
+
+  update();
+  save();
+
+ }else{
+
+  alert("Butuh 1.000 coin!");
+
+ }
+
 }
 
-
-// beli roket
 function beliRoket(){
 
-if(coin >= 10000){
+ if(coin>=10000){
 
-coin -= 10000;
-roket++;
+  coin-=10000;
+  roket++;
 
-update();
-save();
+  update();
+  save();
 
-}else{
+ }else{
 
-alert("Butuh 10.000 coin!");
+  alert("Butuh 10.000 coin!");
+
+ }
 
 }
 
-}
-
-
-// beli planet
 function beliPlanet(){
 
-if(coin >= 100000){
+ if(coin>=100000){
 
-coin -= 100000;
-planet++;
+  coin-=100000;
+  planet++;
 
-update();
-save();
+  update();
+  save();
 
-}else{
+ }else{
 
-alert("Butuh 100.000 coin!");
+  alert("Butuh 100.000 coin!");
+
+ }
 
 }
 
-}
-
-
-// beli matahari
 function beliMatahari(){
 
-if(coin >= 500000){
+ if(coin>=500000){
 
-coin -= 500000;
-matahari++;
+  coin-=500000;
+  matahari++;
 
-update();
-save();
+  update();
+  save();
 
-}else{
+ }else{
 
-alert("Butuh 500.000 coin!");
+  alert("Butuh 500.000 coin!");
+
+ }
 
 }
 
-}
-
-
-// beli nebula
 function beliNebula(){
 
-if(coin >= 1000000){
+ if(coin>=1000000){
 
-coin -= 1000000;
-nebula++;
+  coin-=1000000;
+  nebula++;
 
-update();
-save();
+  update();
+  save();
 
-}else{
+ }else{
 
-alert("Butuh 1.000.000 coin!");
+  alert("Butuh 1.000.000 coin!");
+ }
+ 
+ 
+ }
+function belisupernova(){
+  
+  if(coin>=1000000){
+  coin-=1000000;
+  supernova++;
+  
+  update();
+  save();
+  
+  }else{
+  
+  alert("butuh 1.000.000.000 coin!");
+  }
 
 }
-
-}
-
-
-// pendapatan otomatis setiap detik
 
 setInterval(()=>{
 
-coin +=
-(auto * 10) +
-(roket * 10) +
-(planet * 150) +
-(matahari * 1000) +
-(nebula * 20000);
-
-
-update();
-save();
+ coin +=
+ (auto*10)+
+ (roket*100)+
+ (planet*1000)+
+ (matahari*5000)+
+ (nebula*20000)+
+ (supernova*100000);
+ 
+ update();
+ save();
 
 },1000);
 
-
-
-// simpan data
-
 function save(){
 
-localStorage.setItem("coin",coin);
-localStorage.setItem("power",power);
+ localStorage.setItem("coin",coin);
+ localStorage.setItem("power",power);
 
-localStorage.setItem("auto",auto);
-localStorage.setItem("roket",roket);
-localStorage.setItem("planet",planet);
-localStorage.setItem("matahari",matahari);
-localStorage.setItem("nebula",nebula);
-
+ localStorage.setItem("auto",auto);
+ localStorage.setItem("roket",roket);
+ localStorage.setItem("planet",planet);
+ localStorage.setItem("matahari",matahari);
+ localStorage.setItem("nebula",nebula);
+ localStorage.setItem("supernova",supernova);
 }
-
-
-
-// update tampilan
 
 function update(){
 
-document.getElementById("coin").innerHTML =
-coin+" 💰";
+ document.getElementById("coin").innerHTML=
+ coin.toLocaleString()+" 💰";
 
-document.getElementById("power").innerHTML =
-power;
+ document.getElementById("power").innerHTML=
+ power;
 
-document.getElementById("hargaUpgrade").innerHTML =
-power*100;
+ document.getElementById("hargaUpgrade").innerHTML=
+ (power*100).toLocaleString();
 
-document.getElementById("auto").innerHTML =
-auto;
+ document.getElementById("auto").innerHTML=
+ auto;
 
-document.getElementById("roket").innerHTML =
-roket;
+ document.getElementById("roket").innerHTML=
+ roket;
 
-document.getElementById("planet").innerHTML =
-planet;
+ document.getElementById("planet").innerHTML=
+ planet;
 
-document.getElementById("matahari").innerHTML =
-matahari;
+ document.getElementById("matahari").innerHTML=
+ matahari;
 
-document.getElementById("nebula").innerHTML =
-nebula;
+ document.getElementById("nebula").innerHTML=
+ nebula;
+ 
+ document.getElementById("supernova").innerHTML=
+ supernova;
+ 
+ 
 
+ if(coin >= 10000 && !achievement10000){
+ achievement10000 = true;
+ 
+ alert("🏆 Achievement: Kumpulkan 10.000 Coin!");
+}
+
+if(coin >= 100000 && !achievement100000){
+ achievement100000 = true;
+ alert("🏆 Achievement: Kumpulkan 100.000 Coin!");
+}
+ if (coin >= 1000000 && !achievement1000000){
+ achievement1000000 = true;
+ alert("🏆 Achievement: kumpulkan 1.000.000.00")
+ }
 }
 
 
 update();
 
 </script>
-
 
 </body>
 </html>
