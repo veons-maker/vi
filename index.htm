@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+<meta charset="UTF-8">
 <title>Galaxy Clicker</title>
 
 <style>
@@ -32,10 +32,11 @@ h1{
  background:radial-gradient(circle,#00ffff,#0044ff,#000);
  box-shadow:0 0 40px cyan;
  cursor:pointer;
+ transition:0.1s;
 }
 
 #clickPlanet:active{
- transform:scale(.85);
+ transform:scale(0.9);
 }
 
 .box{
@@ -54,10 +55,7 @@ button{
  border:0;
  border-radius:15px;
  font-size:16px;
-}
-
-hr{
- border:1px solid #ffffff44;
+ cursor:pointer;
 }
 
 .floating{
@@ -75,15 +73,18 @@ hr{
   opacity:1;
   transform:translateY(0);
  }
-
  to{
   opacity:0;
   transform:translateY(-60px);
  }
 }
 
-</style>
+.crit{
+ color:red;
+ font-size:30px;
+}
 
+</style>
 </head>
 
 <body>
@@ -94,10 +95,13 @@ hr{
 
 <div id="clickPlanet" onclick="klik(event)"></div>
 
-<div class="box">
+<button onclick="toggleShop()">
+🛒 SHOP
+</button>
+
+<div class="box" id="shop" style="display:none;">
 
 <p>⚡ Power: <span id="power">1</span></p>
-
 <p>💰 Harga Upgrade: <span id="hargaUpgrade">100</span></p>
 
 <button onclick="upgrade()">
@@ -110,51 +114,61 @@ hr{
 
 <p>🖱️ Auto Clicker: <span id="auto">0</span></p>
 <p>Harga: 1.000</p>
-
 <button onclick="beliAuto()">
 🖱️ Beli Auto Clicker
 </button>
 
 <p>🚀 Roket: <span id="roket">0</span></p>
 <p>Harga: 10.000</p>
-
 <button onclick="beliRoket()">
 🚀 Beli Roket
 </button>
 
 <p>🪐 Planet: <span id="planet">0</span></p>
-<p>Harga: 100.000</p>
-
+<p>Harga: 50.000</p>
 <button onclick="beliPlanet()">
 🪐 Beli Planet
 </button>
 
 <p>☀️ Matahari: <span id="matahari">0</span></p>
 <p>Harga: 500.000</p>
-
 <button onclick="beliMatahari()">
 ☀️ Beli Matahari
 </button>
 
 <p>🌌 Nebula: <span id="nebula">0</span></p>
 <p>Harga: 1.000.000</p>
-
 <button onclick="beliNebula()">
-🌌 Beli nebula
+🌌 Beli Nebula
 </button>
 
 <p>💥 Supernova: <span id="supernova">0</span></p>
-<p>harga: 1.000.000.000</p>
+<p>Harga: 1.000.000.000</p>
+<button onclick="beliSupernova()">
+💥 Beli Supernova
+</button>
 
-<button onclick="belisupernova()">
-💥 beli supernova
+<p>⭐ Stardust: <span id="stardust">0</span></p>
+
+<button onclick="rebirth()">
+⭐ Rebirth (1 Miliar Coin)
 </button>
 
 </div>
 
-<script>
+<div class="box">
 
-let coin = Number(localStorage.getItem("coin"))
+<h3>📊 Statistik</h3>
+
+<p>Total Klik: <span id="statKlik">0</span></p>
+<p>Total Coin Didapat: <span id="statCoin">0</span></p>
+<p>Total Rebirth: <span id="statRebirth">0</span></p>
+<p>⏰ Waktu Bermain:
+<span id="waktuMain">0j 0m 0d</span></p>
+
+</div>
+
+<script>let coin = Number(localStorage.getItem("coin")) || 0;
 let power = Number(localStorage.getItem("power")) || 1;
 
 let auto = Number(localStorage.getItem("auto")) || 0;
@@ -164,24 +178,98 @@ let matahari = Number(localStorage.getItem("matahari")) || 0;
 let nebula = Number(localStorage.getItem("nebula")) || 0;
 let supernova = Number(localStorage.getItem("supernova")) || 0;
 
-let achievement1000 = false;
-let achievement100000 = false;
-let achievement1000000 = false;
-function klik(event){
-  
-  let achievement10000 = false;
-let achievement100000 = false;
-let achievement1000000 = false;
+let stardust = Number(localStorage.getItem("stardust")) || 0;
 
- coin += power;
+let totalKlik = Number(localStorage.getItem("totalKlik")) || 0;
+let totalCoin = Number(localStorage.getItem("totalCoin")) || 0;
+let totalRebirth = Number(localStorage.getItem("totalRebirth")) || 0;
+let waktuMain = Number(localStorage.getItem("waktuMain")) || 0;
 
- let text=document.createElement("div");
+let achievement10000 =
+localStorage.getItem("achievement10000") === "true";
 
- text.className="floating";
- text.innerHTML="+"+power;
+let achievement100000 =
+localStorage.getItem("achievement100000") === "true";
 
- text.style.left=event.clientX+"px";
- text.style.top=event.clientY+"px";
+let achievement1000000 =
+localStorage.getItem("achievement1000000") === "true";
+
+let lastTime =
+Number(localStorage.getItem("lastTime")) || Date.now();
+
+function incomePerSecond(){
+ return (
+  (auto*10)+
+  (roket*100)+
+  (planet*1000)+
+  (matahari*5000)+
+  (nebula*20000)+
+  (supernova*100000)
+ );
+}
+
+let offlineSeconds =
+Math.floor((Date.now()-lastTime)/1000);
+
+/* maksimal 8 jam */
+if(offlineSeconds > 28800){
+ offlineSeconds = 28800;
+}
+
+let offlineCoin =
+offlineSeconds * incomePerSecond();
+
+if(offlineCoin > 0){
+
+ coin += offlineCoin;
+
+ alert(
+ "💰 Offline Income\n\n"+
+ "Offline selama "+
+ offlineSeconds.toLocaleString()+
+ " detik\n\n"+
+ "Mendapat "+
+ offlineCoin.toLocaleString()+
+ " coin!"
+ );
+
+}function klik(event){
+
+ let critical = Math.random() < 0.05;
+
+ let hasilKlik;
+
+ if(critical){
+  hasilKlik = power * 10;
+ }else{
+  hasilKlik = power;
+ }
+
+ /* bonus rebirth */
+ hasilKlik = Math.floor(
+  hasilKlik * (1 + (stardust * 0.1))
+ );
+
+ coin += hasilKlik;
+
+ totalKlik++;
+ totalCoin += hasilKlik;
+
+ let text = document.createElement("div");
+
+ text.className = "floating";
+
+ if(critical){
+  text.classList.add("crit");
+  text.innerHTML = "💥 CRIT +" +
+  hasilKlik.toLocaleString();
+ }else{
+  text.innerHTML =
+  "+" + hasilKlik.toLocaleString();
+ }
+
+ text.style.left = event.clientX + "px";
+ text.style.top = event.clientY + "px";
 
  document.body.appendChild(text);
 
@@ -191,16 +279,15 @@ let achievement1000000 = false;
 
  update();
  save();
-
 }
 
 function upgrade(){
 
- let harga=power*100;
+ let harga = power * 100;
 
- if(coin>=harga){
+ if(coin >= harga){
 
-  coin-=harga;
+  coin -= harga;
   power++;
 
   update();
@@ -208,133 +295,28 @@ function upgrade(){
 
  }else{
 
-  alert("Butuh "+harga.toLocaleString()+" coin!");
+  alert(
+   "Butuh " +
+   harga.toLocaleString() +
+   " coin!"
+  );
 
  }
 
 }
 
-function beliauro(){
+function toggleShop(){
 
- if(coin>=1000){
+ let shop =
+ document.getElementById("shop");
 
-  coin-=1000;
-  auto++;
-  
-alert("Auto sekarang: " + auto);
-
-  update();
-  save();
-
+ if(shop.style.display=="none"){
+  shop.style.display="block";
  }else{
-
-  alert("Butuh 1.000 coin!");
-
+  shop.style.display="none";
  }
 
 }
-
-function beliRoket(){
-
- if(coin>=10000){
-
-  coin-=10000;
-  roket++;
-
-  update();
-  save();
-
- }else{
-
-  alert("Butuh 10.000 coin!");
-
- }
-
-}
-
-function beliPlanet(){
-
- if(coin>=100000){
-
-  coin-=100000;
-  planet++;
-
-  update();
-  save();
-
- }else{
-
-  alert("Butuh 100.000 coin!");
-
- }
-
-}
-
-function beliMatahari(){
-
- if(coin>=500000){
-
-  coin-=500000;
-  matahari++;
-
-  update();
-  save();
-
- }else{
-
-  alert("Butuh 500.000 coin!");
-
- }
-
-}
-
-function beliNebula(){
-
- if(coin>=1000000){
-
-  coin-=1000000;
-  nebula++;
-
-  update();
-  save();
-
- }else{
-
-  alert("Butuh 1.000.000 coin!");
- }
- 
- 
- }
-function belisupernova(){
-  
-  if(coin>=1000000){
-  coin-=1000000;
-  supernova++;
-  
-  update();
-  save();
-  
-  }else{
-  
-  alert("butuh 1.000.000.000 coin!");
-  }
-
-}
-
-setInterval(()=>{
-
- coin +=
- (auto*10)+
- (roket*100)+
- (planet*1000)+
- (matahari*5000)+
- (nebula*20000)+
- (supernova*100000);
- 
- update();
- save();
-
-},1000);
 
 function save(){
 
@@ -347,57 +329,301 @@ function save(){
  localStorage.setItem("matahari",matahari);
  localStorage.setItem("nebula",nebula);
  localStorage.setItem("supernova",supernova);
+
+ localStorage.setItem("stardust",stardust);
+
+ localStorage.setItem(
+  "totalKlik",
+  totalKlik
+ );
+
+ localStorage.setItem(
+  "totalCoin",
+  totalCoin
+ );
+
+ localStorage.setItem(
+  "totalRebirth",
+  totalRebirth
+ );
+
+ localStorage.setItem(
+  "waktuMain",
+  waktuMain
+ );
+
+ localStorage.setItem(
+  "lastTime",
+  Date.now()
+ );
+
+ localStorage.setItem(
+  "achievement10000",
+  achievement10000
+ );
+
+ localStorage.setItem(
+  "achievement100000",
+  achievement100000
+ );
+
+ localStorage.setItem(
+  "achievement1000000",
+  achievement1000000
+ );
+
 }
 
 function update(){
 
- document.getElementById("coin").innerHTML=
+ document.getElementById("coin").innerHTML =
  coin.toLocaleString()+" 💰";
 
- document.getElementById("power").innerHTML=
+ document.getElementById("power").innerHTML =
  power;
 
- document.getElementById("hargaUpgrade").innerHTML=
+ document.getElementById(
+  "hargaUpgrade"
+ ).innerHTML =
  (power*100).toLocaleString();
 
- document.getElementById("auto").innerHTML=
+ document.getElementById("auto").innerHTML =
  auto;
 
- document.getElementById("roket").innerHTML=
+ document.getElementById("roket").innerHTML =
  roket;
 
- document.getElementById("planet").innerHTML=
+ document.getElementById("planet").innerHTML =
  planet;
 
- document.getElementById("matahari").innerHTML=
+ document.getElementById(
+  "matahari"
+ ).innerHTML =
  matahari;
 
- document.getElementById("nebula").innerHTML=
+ document.getElementById(
+  "nebula"
+ ).innerHTML =
  nebula;
- 
- document.getElementById("supernova").innerHTML=
+
+ document.getElementById(
+  "supernova"
+ ).innerHTML =
  supernova;
- 
- 
 
- if(coin >= 10000 && !achievement10000){
- achievement10000 = true;
- 
- alert("🏆 Achievement: Kumpulkan 10.000 Coin!");
-}
+ document.getElementById(
+  "stardust"
+ ).innerHTML =
+ stardust;
 
-if(coin >= 100000 && !achievement100000){
- achievement100000 = true;
- alert("🏆 Achievement: Kumpulkan 100.000 Coin!");
-}
- if (coin >= 1000000 && !achievement1000000){
- achievement1000000 = true;
- alert("🏆 Achievement: kumpulkan 1.000.000.00")
+ document.getElementById(
+  "statKlik"
+ ).innerHTML =
+ totalKlik.toLocaleString();
+
+ document.getElementById(
+  "statCoin"
+ ).innerHTML =
+ totalCoin.toLocaleString();
+
+ document.getElementById(
+  "statRebirth"
+ ).innerHTML =
+ totalRebirth.toLocaleString();
+
+ let jam =
+ Math.floor(waktuMain/3600);
+
+ let menit =
+ Math.floor(
+ (waktuMain%3600)/60
+ );
+
+ let detik =
+ waktuMain%60;
+
+ document.getElementById(
+  "waktuMain"
+ ).innerHTML =
+ jam+"j "+
+ menit+"m "+
+ detik+"d";
+
+ if(
+  coin >= 10000 &&
+  !achievement10000
+ ){
+  achievement10000 = true;
+  alert(
+   "🏆 Achievement:\n10.000 Coin!"
+  );
  }
+
+ if(
+  coin >= 100000 &&
+  !achievement100000
+ ){
+  achievement100000 = true;
+  alert(
+   "🏆 Achievement:\n100.000 Coin!"
+  );
+ }
+
+ if(
+  coin >= 1000000 &&
+  !achievement1000000
+ ){
+  achievement1000000 = true;
+  alert(
+   "🏆 Achievement:\n1.000.000 Coin!"
+  );
+ }
+
+}function beliAuto(){
+
+ if(coin >= 1000){
+  coin -= 1000;
+  auto++;
+
+  update();
+  save();
+ }else{
+  alert("Butuh 1.000 coin!");
+ }
+
 }
 
+function beliRoket(){
+
+ if(coin >= 10000){
+  coin -= 10000;
+  roket++;
+
+  update();
+  save();
+ }else{
+  alert("Butuh 10.000 coin!");
+ }
+
+}
+
+function beliPlanet(){
+
+ if(coin >= 50000){
+  coin -= 50000;
+  planet++;
+
+  update();
+  save();
+ }else{
+  alert("Butuh 50.000 coin!");
+ }
+
+}
+
+function beliMatahari(){
+
+ if(coin >= 500000){
+  coin -= 500000;
+  matahari++;
+
+  update();
+  save();
+ }else{
+  alert("Butuh 500.000 coin!");
+ }
+
+}
+
+function beliNebula(){
+
+ if(coin >= 1000000){
+  coin -= 1000000;
+  nebula++;
+
+  update();
+  save();
+ }else{
+  alert("Butuh 1.000.000 coin!");
+ }
+
+}
+
+function beliSupernova(){
+
+ if(coin >= 1000000000){
+  coin -= 1000000000;
+  supernova++;
+
+  update();
+  save();
+ }else{
+  alert("Butuh 1.000.000.000 coin!");
+ }
+
+}
+
+function rebirth(){
+
+ if(coin >= 1000000000){
+
+  stardust++;
+
+  totalRebirth++;
+
+  coin = 0;
+  power = 1;
+
+  auto = 0;
+  roket = 0;
+  planet = 0;
+  matahari = 0;
+  nebula = 0;
+  supernova = 0;
+
+  alert(
+   "⭐ Rebirth berhasil!\n"+
+   "Stardust sekarang: "+
+   stardust
+  );
+
+  update();
+  save();
+
+ }else{
+
+  alert(
+   "Butuh 1 miliar coin!"
+  );
+
+ }
+
+}
+
+/* Timer utama */
+setInterval(()=>{
+
+ waktuMain++;
+
+ let passive =
+ incomePerSecond();
+
+ /* bonus stardust */
+ passive = Math.floor(
+  passive * (1 + (stardust * 0.1))
+ );
+
+ coin += passive;
+
+ totalCoin += passive;
+
+ update();
+ save();
+
+},1000);
 
 update();
+save();
 
 </script>
 
